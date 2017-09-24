@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Orleans.Runtime.Configuration;
+using Orleans.Runtime.Host;
 
 namespace OrleansServer
 {
@@ -10,6 +8,19 @@ namespace OrleansServer
 	{
 		static void Main(string[] args)
 		{
+
+			var siloConfig = ClusterConfiguration.LocalhostPrimarySilo();
+
+
+			var silo = new SiloHost("Alt.NET Demo Silo", siloConfig);
+			silo.InitializeOrleansSilo();
+			silo.StartOrleansSilo();
+
+			Console.WriteLine("Press Enter to close.");
+			Console.ReadLine();
+
+			// shut the silo down after we are done.
+			silo.ShutdownOrleansSilo();
 		}
 	}
 }

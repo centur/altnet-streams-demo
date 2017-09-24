@@ -7,6 +7,6 @@ namespace GrainInterfaces
 	public interface IChatRoom : IGrainWithStringKey
 	{
 		Task<ChatMsg[]> ReadHistory(int numberOfMessages);
-		Task<bool> ReceiveMessage(ChatMsg msg);
+		Task<bool> PostMessage(ChatMsg msg);
 	}
 }

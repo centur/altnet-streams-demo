@@ -43,7 +43,7 @@ namespace GrainImplementation
 			return Task.FromResult(response);
 		}
 
-		public Task<bool> ReceiveMessage(ChatMsg msg)
+		public Task<bool> PostMessage(ChatMsg msg)
 		{
 			_messages.Add(msg);
 			return Task.FromResult(true);

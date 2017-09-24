@@ -11,7 +11,6 @@ namespace OrleansServer
 
 			var siloConfig = ClusterConfiguration.LocalhostPrimarySilo();
 
-
 			var silo = new SiloHost("Alt.NET Demo Silo", siloConfig);
 			silo.InitializeOrleansSilo();
 			silo.StartOrleansSilo();

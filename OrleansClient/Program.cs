@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using GrainInterfaces;
+using GrainInterfaces.Model;
 using Orleans;
 using Orleans.Runtime.Configuration;
 using Utils;
@@ -18,7 +20,8 @@ namespace OrleansClient
 			PrettyConsole.Line("==== CLIENT: Initialized ====", ConsoleColor.Cyan);
 			PrettyConsole.Line("CLIENT: Write commands:", ConsoleColor.Cyan);
 
-			Menu(clientInstance);
+
+			Menu(clientInstance).GetAwaiter().GetResult();
 
 			PrettyConsole.Line("==== CLIENT: Shutting down ====", ConsoleColor.DarkRed);
 		}
@@ -26,18 +29,21 @@ namespace OrleansClient
 		static async Task<IClusterClient> InitializeClient(string[] args)
 		{
 			int initializeCounter = 0;
-
 			var config = ClientConfiguration.LocalhostSilo();
-			var builder = new ClientBuilder().UseConfiguration(config);
 
-			var initSucceed = true;
-			while (initSucceed)
+			var initSucceed = false;
+			while (!initSucceed)
 			{
 				try
 				{
-					var client = builder.Build();
+					var client = new ClientBuilder().UseConfiguration(config).Build();
 					await client.Connect();
-					return client;
+					initSucceed = client.IsInitialized;
+
+					if (initSucceed)
+					{
+						return client;
+					}
 				}
 				catch (Exception exc)
 				{
@@ -62,40 +68,72 @@ namespace OrleansClient
 			var menuColor = ConsoleColor.Magenta;
 			PrettyConsole.Line("Type '/join <channel>' to join specific channel", menuColor);
 			PrettyConsole.Line("Type '<message>' to send a message", menuColor);
+			PrettyConsole.Line("Type '/hist' to re-read history", menuColor);
 			PrettyConsole.Line("Type '/exit' to exit client.", menuColor);
 		}
 
-		private static void Menu(IClusterClient client)
+		private static async Task Menu(IClusterClient client)
 		{
 			string input;
+			PrintHints();
+
 			do
 			{
-				PrintHints();
-
 				input = Console.ReadLine();
 
 				if (string.IsNullOrWhiteSpace(input)) continue;
 
-				if (input.StartsWith("/join"))
+				if (input.StartsWith("/j"))
 				{
-					var channelName = input.Replace("/join ", "");
-					JoinChannel(client, channelName);
+					await JoinChannel(client, input.Replace("/join ", "").Trim());
+				}
+				else if (input.StartsWith("/h"))
+				{
+					await ShowCurrentChannelHistory(client);
+				}
+				else if (input.StartsWith("/exit"))
+				{
 				}
 				else
 				{
-					SendMessage(client, input, _joinedChannel);
+					await SendMessage(client, input, _joinedChannel);
 				}
 			} while (input != "/exit");
 		}
 
-		private static void SendMessage(IClusterClient client, string input, string joinedChannel)
+		private static async Task SendMessage(IClusterClient client, string input, string joinedChannel)
 		{
-			PrettyConsole.Line($"Sending '{input}' to channel {joinedChannel}");
+			var room = client.GetGrain<IChatRoom>(_joinedChannel);
+			await room.PostMessage(new ChatMsg("Alexey", input));
 		}
 
-		private static void JoinChannel(IClusterClient client, string channelName)
+		private static async Task JoinChannel(IClusterClient client, string channelName)
 		{
 			PrettyConsole.Line($"Joining to channel {channelName}");
+			_joinedChannel = channelName;
+
+			await ShowCurrentChannelHistory(client);
+		}
+
+		private static async Task ShowCurrentChannelHistory(IClusterClient client)
+		{
+			var room = client.GetGrain<IChatRoom>(_joinedChannel);
+			var history = await room.ReadHistory(1000);
+
+			foreach (var chatMsg in history)
+			{
+				PrettyConsole.Line($" ({chatMsg.Created:g}) {chatMsg.Author}> {chatMsg.Text}", authorColor(chatMsg.Author));
+			}
+		}
+
+		private static ConsoleColor authorColor(string chatMsgAuthor)
+		{
+			switch (chatMsgAuthor.ToLowerInvariant())
+			{
+				case "alexey": return ConsoleColor.Green;
+				case "system": return ConsoleColor.Red;
+				default: return ConsoleColor.Yellow;
+			}
 		}
 	}
 }

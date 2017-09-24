@@ -66,9 +66,9 @@ namespace OrleansClient
 		private static void PrintHints()
 		{
 			var menuColor = ConsoleColor.Magenta;
-			PrettyConsole.Line("Type '/join <channel>' to join specific channel", menuColor);
+			PrettyConsole.Line("Type '/j <channel>' to join specific channel", menuColor);
 			PrettyConsole.Line("Type '<message>' to send a message", menuColor);
-			PrettyConsole.Line("Type '/hist' to re-read history", menuColor);
+			PrettyConsole.Line("Type '/h' to re-read channel history", menuColor);
 			PrettyConsole.Line("Type '/exit' to exit client.", menuColor);
 		}
 

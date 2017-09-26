@@ -1,4 +1,5 @@
 ﻿using System;
+using Orleans.Runtime;
 using Orleans.Runtime.Configuration;
 using Orleans.Runtime.Host;
 
@@ -10,6 +11,7 @@ namespace OrleansServer
 		{
 
 			var siloConfig = ClusterConfiguration.LocalhostPrimarySilo();
+			siloConfig.Defaults.DefaultTraceLevel = Severity.Error;
 
 			var silo = new SiloHost("Alt.NET Demo Silo", siloConfig);
 			silo.InitializeOrleansSilo();

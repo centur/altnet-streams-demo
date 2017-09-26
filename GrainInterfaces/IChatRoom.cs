@@ -6,7 +6,9 @@ namespace GrainInterfaces
 {
 	public interface IChatRoom : IGrainWithStringKey
 	{
+		Task<bool> Join(string nickname);
+		Task<bool> Leave(string nickname);
+		Task<bool> Message(ChatMsg msg);
 		Task<ChatMsg[]> ReadHistory(int numberOfMessages);
-		Task<bool> PostMessage(ChatMsg msg);
 	}
 }

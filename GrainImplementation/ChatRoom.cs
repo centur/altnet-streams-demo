@@ -5,12 +5,15 @@ using System.Threading.Tasks;
 using GrainInterfaces;
 using GrainInterfaces.Model;
 using Orleans;
+using Utils;
 
 namespace GrainImplementation
 {
 	public class ChatRoom : Grain, IChatRoom
 	{
-		private List<ChatMsg> _messages = new List<ChatMsg>(100);
+
+		private readonly List<ChatMsg> _messages = new List<ChatMsg>(100);
+		private readonly List<string> _onlineMembers = new List<string>(10);
 
 		public override Task OnActivateAsync()
 		{
@@ -28,6 +31,11 @@ namespace GrainImplementation
 
 			_messages.Add(new ChatMsg("System", "Bilbo leaves the chat...") {Created = DateTimeOffset.Now.AddMinutes(-5)});
 
+
+			_onlineMembers.Add("Boromir");
+			_onlineMembers.Add("Gandalf");
+			_onlineMembers.Add("Gollum");
+
 			return base.OnActivateAsync();
 		}
 
@@ -43,10 +51,42 @@ namespace GrainImplementation
 			return Task.FromResult(response);
 		}
 
-		public Task<bool> PostMessage(ChatMsg msg)
+		public async Task<bool> Join(string nickname)
+		{
+			if (_onlineMembers.Contains(nickname)) return false;
+			_onlineMembers.Add(nickname);
+
+			PrettyConsole.Line($"==== System message: '{ nickname} joins the chat '{this.GetPrimaryKeyString()}' ...'", ConsoleColor.Green);
+			
+
+			return true;
+		}
+
+		public async Task<bool> Leave(string nickname)
+		{
+			if (!_onlineMembers.Contains(nickname)) return false;
+
+			_onlineMembers.Remove(nickname);
+
+
+			PrettyConsole.Line($"==== System message: '{ nickname} leaves the chat...'", ConsoleColor.Green);
+
+			return true;
+		}
+
+		public async Task<bool> Message(ChatMsg msg)
 		{
 			_messages.Add(msg);
-			return Task.FromResult(true);
+
+
+			var textHasMention = msg.Text.Contains("@");
+			if (textHasMention)
+			{
+				PrettyConsole.Line($"==== MENTION DETECTED: '{msg.Author}' mentions someone. Sending a notification email.", ConsoleColor.Green);
+			}
+
+			return true;
 		}
+
 	}
 }

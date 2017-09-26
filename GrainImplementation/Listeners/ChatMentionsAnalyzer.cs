@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Threading.Tasks;
+using GrainInterfaces.Listeners;
 using GrainInterfaces.Model;
 using Orleans;
 using Orleans.Streams;
 using Utils;
 
-namespace GrainImplementation
+namespace GrainImplementation.Listeners
 {
 	[ImplicitStreamSubscription(nameof(ChatMsg))]
-	public class ChatMentionsAnalyzer : BaseListener<ChatMsg>
+	public class ChatMentionsAnalyzer : BaseListener<ChatMsg>, IChatMessageListener
 	{
 		public ChatMentionsAnalyzer()
 		{

@@ -1,14 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using Orleans;
+﻿using GrainInterfaces.Model;
 using Orleans.Streams;
 
-namespace GrainInterfaces.Listener
+namespace GrainInterfaces.Listeners
 {
-	public interface IStreamListener<TMessage> : IGrainWithGuidKey
+	public interface IChatMessageListener : IAsyncObserver<ChatMsg>
 	{
-		Task ReceiveCommand(TMessage item, StreamSequenceToken token = null);
-		Task OnCommandCompleted();
-		Task OnCommandError(Exception ex);
 	}
 }

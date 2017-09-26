@@ -5,7 +5,7 @@ using Orleans;
 using Orleans.Streams;
 using Utils;
 
-namespace GrainImplementation
+namespace GrainImplementation.Listeners
 {
 	public class BaseListener<TMessage> : Grain, IAsyncObserver<TMessage>, IGrainWithGuidKey
 	{

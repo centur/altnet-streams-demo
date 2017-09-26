@@ -182,10 +182,6 @@
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GrainImplementation\GrainImplementation.csproj">
-      <Project>{3eb4ecc9-10dd-4c28-a269-350e177966e0}</Project>
-      <Name>GrainImplementation</Name>
-    </ProjectReference>
     <ProjectReference Include="..\GrainInterfaces\GrainInterfaces.csproj">
       <Project>{513AEC9E-AD28-4D5F-A351-7FA8A32421DD}</Project>
       <Name>GrainInterfaces</Name>

@@ -29,7 +29,8 @@ namespace OrleansClient
 		static async Task<IClusterClient> InitializeClient(string[] args)
 		{
 			int initializeCounter = 0;
-			var config = ClientConfiguration.LocalhostSilo();
+			var config = ClientConfiguration.LocalhostSilo()
+				.SimpleMessageStreamProvider(FluentConfig.AltNetStream);
 
 			var initSucceed = false;
 			while (!initSucceed)
@@ -96,15 +97,15 @@ namespace OrleansClient
 				}
 				else
 				{
-					await SendMessage(client, input, _joinedChannel);
+					await SendMessage(client, input);
 				}
 			} while (input != "/exit");
 		}
 
-		private static async Task SendMessage(IClusterClient client, string input, string joinedChannel)
+		private static async Task SendMessage(IClusterClient client, string messageText)
 		{
 			var room = client.GetGrain<IChatRoom>(_joinedChannel);
-			await room.PostMessage(new ChatMsg("Alexey", input));
+			await room.PostMessage(new ChatMsg("Alexey", messageText));
 		}
 
 		private static async Task JoinChannel(IClusterClient client, string channelName)
@@ -120,10 +121,12 @@ namespace OrleansClient
 			var room = client.GetGrain<IChatRoom>(_joinedChannel);
 			var history = await room.ReadHistory(1000);
 
+			PrettyConsole.Line($"====== History for '{_joinedChannel}' ======", ConsoleColor.DarkGreen);
 			foreach (var chatMsg in history)
 			{
 				PrettyConsole.Line($" ({chatMsg.Created:g}) {chatMsg.Author}> {chatMsg.Text}", authorColor(chatMsg.Author));
 			}
+			PrettyConsole.Line("============", ConsoleColor.DarkGreen);
 		}
 
 		private static ConsoleColor authorColor(string chatMsgAuthor)

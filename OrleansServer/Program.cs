@@ -1,6 +1,7 @@
 ﻿using System;
 using Orleans.Runtime.Configuration;
 using Orleans.Runtime.Host;
+using Utils;
 
 namespace OrleansServer
 {
@@ -10,6 +11,10 @@ namespace OrleansServer
 		{
 
 			var siloConfig = ClusterConfiguration.LocalhostPrimarySilo();
+
+			siloConfig
+				.SimpleMessageStreamProvider(FluentConfig.AltNetStream);
+
 
 			var silo = new SiloHost("Alt.NET Demo Silo", siloConfig);
 			silo.InitializeOrleansSilo();

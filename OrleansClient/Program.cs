@@ -11,7 +11,7 @@ namespace OrleansClient
 {
 	class Program
 	{
-		private static string _joinedChannel = "#general";
+		private static string _joinedChannel = "general";
 
 		static void Main(string[] args)
 		{
@@ -105,7 +105,7 @@ namespace OrleansClient
 		private static async Task SendMessage(IClusterClient client, string messageText)
 		{
 			var room = client.GetGrain<IChatRoom>(_joinedChannel);
-			await room.PostMessage(new ChatMsg("Alexey", messageText));
+			await room.Message(new ChatMsg("Alexey", messageText));
 		}
 
 		private static async Task JoinChannel(IClusterClient client, string channelName)

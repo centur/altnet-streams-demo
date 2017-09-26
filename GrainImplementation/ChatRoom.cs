@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using GrainInterfaces;
 using GrainInterfaces.Model;
 using Orleans;
+using Orleans.Streams;
+using Utils;
 
 namespace GrainImplementation
 {
@@ -12,8 +14,12 @@ namespace GrainImplementation
 	{
 		private List<ChatMsg> _messages = new List<ChatMsg>(100);
 
+		private IStreamProvider _streamProvider;
+
 		public override Task OnActivateAsync()
 		{
+			_streamProvider = base.GetStreamProvider(FluentConfig.AltNetStream);
+
 			_messages.Add(new ChatMsg("System", "Gandalf joins the chat...") {Created = DateTimeOffset.Now.AddHours(-10)});
 			_messages.Add(new ChatMsg("System", "Boromir joins the chat...") {Created = DateTimeOffset.Now.AddHours(-8)});
 			_messages.Add(new ChatMsg("System", "Gollum joins the chat...") {Created = DateTimeOffset.Now.AddHours(-8)});
@@ -31,7 +37,6 @@ namespace GrainImplementation
 			return base.OnActivateAsync();
 		}
 
-
 		public Task<ChatMsg[]> ReadHistory(int numberOfMessages)
 		{
 			var response = _messages
@@ -43,10 +48,15 @@ namespace GrainImplementation
 			return Task.FromResult(response);
 		}
 
-		public Task<bool> PostMessage(ChatMsg msg)
+		public async Task<bool> Message(ChatMsg msg)
 		{
 			_messages.Add(msg);
-			return Task.FromResult(true);
+
+			
+			var stream = _streamProvider.GetStream<ChatMsg>(Guid.NewGuid(), nameof(ChatMsg));
+			await stream.OnNextAsync(msg);
+
+			return true;
 		}
 	}
 }

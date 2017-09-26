@@ -6,7 +6,7 @@ namespace Utils
 {
 	public static class FluentConfig
 	{
-		public static string AltNetStream = "alt.net.stream";
+		public static string AltNetStream = "AltNetStream";
 		
 		public static ClientConfiguration SimpleMessageStreamProvider(this ClientConfiguration config, string streamName,
 			string pubSubType = "ImplicitOnly")

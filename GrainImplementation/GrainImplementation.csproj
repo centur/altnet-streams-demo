@@ -137,6 +137,7 @@
     <Compile Include="Listeners\BaseListener.cs" />
     <Compile Include="Listeners\ChatMentionsAnalyzer.cs" />
     <Compile Include="ChatRoom.cs" />
+    <Compile Include="Listeners\SystemMessagesBroadcaster.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

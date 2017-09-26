@@ -37,11 +37,13 @@ namespace GrainImplementation.Listeners
 
 		public virtual Task OnCompletedAsync()
 		{
+			PrettyConsole.Line("==== Stream is Complete ====", ConsoleColor.Green);
 			return Task.CompletedTask;
 		}
 
 		public virtual Task OnErrorAsync(Exception ex)
 		{
+			PrettyConsole.Line($"==== ERROR: {ex.Message}", ConsoleColor.DarkRed);
 			return Task.CompletedTask;
 		}
 	}

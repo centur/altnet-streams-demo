@@ -132,7 +132,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Listeners\IStreamListener.cs" />
+    <Compile Include="Listeners\IChatMentionsAnalyzer.cs" />
+    <Compile Include="Listeners\ISystemMessagesBroadcaster.cs" />
     <Compile Include="Model\ChatMsg.cs" />
     <Compile Include="IChatRoom.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

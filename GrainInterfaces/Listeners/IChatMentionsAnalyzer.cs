@@ -4,7 +4,7 @@ using Orleans.Streams;
 
 namespace GrainInterfaces.Listeners
 {
-	public interface IChatMessageListener : IAsyncObserver<ChatMsg>, IGrainWithGuidKey
+	public interface IChatMentionsAnalyzer : IAsyncObserver<ChatMsg>, IGrainWithGuidKey
 	{
 	}
 }

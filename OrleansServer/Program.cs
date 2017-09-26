@@ -1,4 +1,5 @@
 ﻿using System;
+using Orleans.Runtime;
 using Orleans.Runtime.Configuration;
 using Orleans.Runtime.Host;
 using Utils;
@@ -14,6 +15,7 @@ namespace OrleansServer
 
 			siloConfig
 				.SimpleMessageStreamProvider(FluentConfig.AltNetStream);
+			siloConfig.Defaults.DefaultTraceLevel = Severity.Error;
 
 
 			var silo = new SiloHost("Alt.NET Demo Silo", siloConfig);

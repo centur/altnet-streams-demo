@@ -9,19 +9,18 @@ using Utils;
 namespace GrainImplementation.Listeners
 {
 	[ImplicitStreamSubscription(nameof(ChatMsg))]
-	public class ChatMentionsAnalyzer : BaseListener<ChatMsg>, IChatMentionsAnalyzer
+	public class SystemMessagesBroadcaster : BaseListener<ChatMsg>, ISystemMessagesBroadcaster
 	{
-		public ChatMentionsAnalyzer()
+		public SystemMessagesBroadcaster()
 		{
 			StreamNamespaces = new[] {nameof(ChatMsg)};
 		}
 
 		public override Task OnNextAsync(ChatMsg item, StreamSequenceToken token = null)
 		{
-			var textHasMention = item.Text.Contains("@");
-			if (textHasMention)
+			if (item.Author == "System")
 			{
-				PrettyConsole.Line($"==== MENTION DETECTED: '{item.Author}' mentions someone. Sending a notification email.", ConsoleColor.Green);
+				PrettyConsole.Line($"==== System message: '{item.Text}'", ConsoleColor.Green);
 			}
 			return Task.CompletedTask;
 		}

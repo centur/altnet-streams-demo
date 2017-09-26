@@ -12,13 +12,14 @@ namespace GrainImplementation
 {
 	public class ChatRoom : Grain, IChatRoom
 	{
-		private List<ChatMsg> _messages = new List<ChatMsg>(100);
+		private readonly List<ChatMsg> _messages = new List<ChatMsg>(100);
+		private readonly List<string> _onlineMembers = new List<string>(10);
 
 		private IStreamProvider _streamProvider;
 
 		public override Task OnActivateAsync()
 		{
-			_streamProvider = base.GetStreamProvider(FluentConfig.AltNetStream);
+			_streamProvider = GetStreamProvider(FluentConfig.AltNetStream);
 
 			_messages.Add(new ChatMsg("System", "Gandalf joins the chat...") {Created = DateTimeOffset.Now.AddHours(-10)});
 			_messages.Add(new ChatMsg("System", "Boromir joins the chat...") {Created = DateTimeOffset.Now.AddHours(-8)});
@@ -34,7 +35,45 @@ namespace GrainImplementation
 
 			_messages.Add(new ChatMsg("System", "Bilbo leaves the chat...") {Created = DateTimeOffset.Now.AddMinutes(-5)});
 
+
+			_onlineMembers.Add("Boromir");
+			_onlineMembers.Add("Gandalf");
+			_onlineMembers.Add("Gollum");
+
 			return base.OnActivateAsync();
+		}
+
+		public async Task<bool> Join(string nickname)
+		{
+			if (_onlineMembers.Contains(nickname)) return false;
+			_onlineMembers.Add(nickname);
+
+			var stream = _streamProvider.GetStream<ChatMsg>(Guid.NewGuid(), nameof(ChatMsg));
+			await stream.OnNextAsync(new ChatMsg("System", $"{nickname} joins the chat '{this.GetPrimaryKeyString()}' ..."));
+
+			return true;
+		}
+
+		public async Task<bool> Leave(string nickname)
+		{
+			if (!_onlineMembers.Contains(nickname)) return false;
+
+			_onlineMembers.Remove(nickname);
+
+			var stream = _streamProvider.GetStream<ChatMsg>(Guid.NewGuid(), nameof(ChatMsg));
+			await stream.OnNextAsync(new ChatMsg("System", $"{nickname} leaves the chat..."));
+
+			return true;
+		}
+
+		public async Task<bool> Message(ChatMsg msg)
+		{
+			_messages.Add(msg);
+			
+			var stream = _streamProvider.GetStream<ChatMsg>(Guid.NewGuid(), nameof(ChatMsg));
+			await stream.OnNextAsync(msg);
+
+			return true;
 		}
 
 		public Task<ChatMsg[]> ReadHistory(int numberOfMessages)
@@ -46,17 +85,6 @@ namespace GrainImplementation
 				.ToArray();
 
 			return Task.FromResult(response);
-		}
-
-		public async Task<bool> Message(ChatMsg msg)
-		{
-			_messages.Add(msg);
-
-			
-			var stream = _streamProvider.GetStream<ChatMsg>(Guid.NewGuid(), nameof(ChatMsg));
-			await stream.OnNextAsync(msg);
-
-			return true;
 		}
 	}
 }

@@ -132,6 +132,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ITicker.cs" />
     <Compile Include="Listeners\IChatMentionsAnalyzer.cs" />
     <Compile Include="Listeners\ISystemMessagesBroadcaster.cs" />
     <Compile Include="Model\ChatMsg.cs" />

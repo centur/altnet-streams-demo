@@ -134,6 +134,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TickerGrain.cs" />
     <Compile Include="Listeners\BaseListener.cs" />
     <Compile Include="Listeners\ChatMentionsAnalyzer.cs" />
     <Compile Include="ChatRoom.cs" />

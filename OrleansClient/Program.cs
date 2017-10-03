@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GrainInterfaces;
@@ -69,6 +70,7 @@ namespace OrleansClient
 		private static void PrintHints()
 		{
 			var menuColor = ConsoleColor.Magenta;
+			PrettyConsole.Line("Type '/r' to run task", menuColor);
 			PrettyConsole.Line("Type '/j <channel>' to join specific channel", menuColor);
 			PrettyConsole.Line("Type '/l <channel>' to leave specific channel", menuColor);
 			PrettyConsole.Line("Type '<any text>' to send a message", menuColor);
@@ -91,6 +93,10 @@ namespace OrleansClient
 				{
 					await JoinChannel(client, input.Replace("/j", "").Trim());
 				}
+				else if (input.StartsWith("/r"))
+				{
+					await RunTask(client);
+				}
 				else if (input.StartsWith("/l"))
 				{
 					await LeaveChannel(client, input.Replace("/l ", "").Trim());
@@ -104,6 +110,25 @@ namespace OrleansClient
 					await SendMessage(client, input);
 				}
 			} while (input != "/exit");
+		}
+
+		private static async Task RunTask(IClusterClient client)
+		{
+			var tick = client.GetGrain<ITicker>(Guid.Empty);
+
+			foreach (var item in Enumerable.Range(1,100))
+			{
+				try
+				{
+					var res = await tick.Tick(10);
+				}
+				catch (Exception e)
+				{
+					PrettyConsole.Line($"Exception {e.Message}");
+				}
+				
+			}
+			
 		}
 
 		private static async Task SendMessage(IClusterClient client, string messageText)
